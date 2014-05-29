@@ -27,6 +27,47 @@ from maraschino.models import Module, XbmcServer, RecentlyAdded, NewznabSite
 
 AVAILABLE_MODULES = [
     {
+        'name': 'pyload',
+        'label': 'Manager - pyLoad',
+        'description': 'Manage pyLoad from wtihin Maraschino',
+        'static': True,
+        'poll': 0,
+        'delay': 0,
+        'settings': [
+            {
+                'key': 'pyload_ip',
+                'value': '',
+                'description': 'pyLoad Hostname'
+            },
+            {
+                'key': 'pyload_port',
+                'value': '',
+                'description': 'pyLoad Port'
+            },
+            {
+                'key': 'pyload_webroot',
+                'value': '',
+                'description': 'pyLoad Webroot',
+            },
+            {
+                'key': 'pyload_https',
+                'value': '0',
+                'description': 'Use HTTPS',
+                'type': 'bool',
+            },
+            {
+                'key': 'pyload_username',
+                'value': '',
+                'description': 'pyLoad Username'
+            },
+            {
+                'key': 'pyload_password',
+                'value': '',
+                'description': 'pyLoad Password'
+            }
+        ]
+    },
+    {
         'name': 'couchpotato',
         'label': 'Manager - CouchPotato',
         'description': 'Manage CouchPotato from within Maraschino',

@@ -1,5 +1,6 @@
 from flask import jsonify, render_template, request, send_file, json
 import urllib2
+import urllib
 import base64
 import StringIO
 
@@ -45,68 +46,29 @@ def pyload_url_no_api():
 
     return pyload_http() + url_base
 
-
 def pyload_api(params=None, use_json=True, dev=False):
-    username = get_setting_value('pyload_user')
-    password = get_setting_value('pyload_password')
-
-    url = pyload_url() + params
-    r = urllib2.Request(url)
-    
-    sys.exit(r)
-# fix the login process here.
-
-
-# if im not logged in, login.
-# then execute the desired api command.
-
-    if username and password:
-        base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
-        r.add_header("Authorization", "Basic %s" % base64string)
-
-    data = urllib2.urlopen(r).read()
-    if dev:
-        print url
-        print data
-    if use_json:
-        data = json.JSONDecoder().decode(data)
+    url = 'http://localhost:8000/api/' + method    
+    data = urllib.urlencode(params)
+    u = urllib.urlopen(url, data)
+    json_data = u.read()
+    data = json.JSONDecoder().decode(json_data)
+    logger.log('pyload_api::Finshed reading from pyLoad', 'DEBUG')
     return data
 
-@app.route('/xhr/pyload/')
+@app.route('/xhr/pyload')
+@requires_auth
 def xhr_pyload():
     params = '/statusServer'
 
-    try:
-        pyload = pyload_api(params)
+    pyload = pyload_api(params)
 
-        if pyload['result'].rfind('success') >= 0:
-            pyload = pyload['data']
-            for time in pyload:
-                for episode in pyload[time]:
-                    episode['image'] = get_pic(episode['tvdbid'], 'banner')
-    except:
-        return render_template('pyload.html',
-            pyload=pyload,
-        )
+    print("statusServer - " + pyload.length + "\n")
 
     return render_template('pyload.html',
         url=pyload_url_no_api(),
         app_link=pyload_url_no_api(),
         pyload=pyload
     )
-
-
-@app.route('/xhr/pyload/add_files/<pid>/<links>')
-def add_files():
-    params = '/addFiles/%s/%s' % (pid, links)
-    
-    try:
-        pyload = pyload_api(params)
-    except:
-        raise Exception
-
-    return pyload['message']
-
 
 @app.route('/xhr/pyload/kill')
 def kill():
@@ -127,4 +89,4 @@ def restart():
     except:
         raise Exception
 
-    return pyload['message']
+    return pyload
